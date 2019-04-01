@@ -2,6 +2,13 @@ const AnyProxy = require('anyproxy');
 var fs = require('fs')
 var moment = require('moment')
 
+///将以下参数存入redis
+/*
+除了将制定请求的参数存入redis还做了两件事
+① 当前操作的公众号昵称写入redis，格式为*.current_nickname。python以此知道正在爬取哪个公众号
+② 当前微信账号的昵称，格式为*.nickname。python以此知道是在模拟哪个微信号爬取
+/*
+
 var interest_url = {
     "load_more":    "https://mp.weixin.qq.com/mp/profile_ext?action=getmsg",        //更多历史消息
     "getappmsgext":     "https://mp.weixin.qq.com/mp/getappmsgext?",                //阅读消息
@@ -32,6 +39,7 @@ function sendToRedis(key, value) {
     client.quit();
 };
 
+/// 定义options 中的参数rule
 const rule = {
     // 模块介绍
     summary: 'my customized rule for AnyProxy',
@@ -97,6 +105,7 @@ const rule = {
     *onConnectError(requestDetail, error) { /* ... */ }
 };
 
+/// anyproxy要求的固定操作
 const options = {
     port: 8001,
     rule: rule,
@@ -109,8 +118,9 @@ const options = {
     wsIntercept: false, // 不开启websocket代理
     silent: true
 };
-const proxyServer = new AnyProxy.ProxyServer(options);
+const proxyServer = new AnyProxy.ProxyServer(options); ///定义代理服务器对象，同时传入配置参数option
 
+/// 开始监听并启动代理服务器
 proxyServer.on('ready', () => { /* */ });
 proxyServer.on('error', (e) => { /* */ });
 proxyServer.start();
